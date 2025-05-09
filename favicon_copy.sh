@@ -4,11 +4,9 @@
 ### CONFIG ############################################################
 SCRIPT_PATH="/jffs/scripts/favicon_copy.sh"
 
-SRC_FAVICON="/jffs/scripts/favicon.ico"
+SRC_FAVICON="/usr/lighttpd/css/favicon.ico"
 DEST_DIR="/tmp/uamsrv/www"
 DEST_FAVICON="$DEST_DIR/favicon.ico"
-
-FAVICON_URL="https://raw.githubusercontent.com/ExtremeFiretop/CaptivePortal_Workaround/main/favicon.ico"
 
 UAM_BIN="/usr/sbin/uamsrv"
 UAM_CONF="/tmp/uamsrv.conf"                  # adjust if needed
@@ -34,30 +32,13 @@ remove_hook() {
     sed -i "\|$HOOK_LINE|d" "$SERVICES_START"
 }
 
-ensure_favicon() {
-    if [ -f "$SRC_FAVICON" ]; then
-        echo "Local favicon already present - OK"
-        return 0
-    fi
-
-    echo "Downloading favicon from GitHub"
-    curl -LSs --retry 4 --retry-delay 5 --retry-connrefused \
-         -o "$SRC_FAVICON" "$FAVICON_URL"
-    if [ $? -ne 0 ]
-    then
-       return 1
-    fi
-    if [ -f "$SRC_FAVICON" ]; then
-        echo "Download favicon succeeded"
-    else
-        echo "Download favicon failed"
+copy_favicon() {
+    if [ ! -f "$SRC_FAVICON" ]; then
+        echo "ERROR: Source favicon not found at $SRC_FAVICON"
         return 1
     fi
-}
 
-copy_favicon() {
-    ensure_favicon || return 1
-    echo "Copying favicon to $DEST_FAVICON"
+    echo "Copying favicon from $SRC_FAVICON to $DEST_FAVICON"
     mkdir -p "$DEST_DIR"
     cp -f "$SRC_FAVICON" "$DEST_FAVICON"
 }
@@ -77,9 +58,6 @@ restart_uamsrv() {
 uninstall_cleanup() {
     echo "Removing boot-hook from $SERVICES_START"
     remove_hook
-
-    echo "Deleting source favicon at $SRC_FAVICON (if present)"
-    rm -f "$SRC_FAVICON"
 
     echo "Deleting script itself ($SCRIPT_PATH)"
     rm -f "$SCRIPT_PATH"
