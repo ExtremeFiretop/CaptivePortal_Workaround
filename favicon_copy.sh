@@ -1,5 +1,5 @@
 #!/bin/sh
-# favicon_copy.sh – Captive-portal favicon helper (install / uninstall)
+# favicon_copy.sh â€“ Captive-portal favicon helper (install / uninstall)
 
 ### CONFIG ############################################################
 SCRIPT_PATH="/jffs/scripts/favicon_copy.sh"
@@ -77,9 +77,6 @@ restart_uamsrv() {
 uninstall_cleanup() {
     echo "Removing boot-hook from $SERVICES_START"
     remove_hook
-
-    echo "Deleting copied favicon at $DEST_FAVICON (if present)"
-    rm -f "$DEST_FAVICON"
 
     echo "Deleting source favicon at $SRC_FAVICON (if present)"
     rm -f "$SRC_FAVICON"
